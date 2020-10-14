@@ -1,55 +1,88 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  FlatList
+}
+  from 'react-native';
+import Todo from './components/Todo';
+import TodoInput from './components/TodoInput';
 
 export default function App() {
 
-  const [enteredTodo, setEnteredTodo] = useState('');
+
   const [Todos, setTodos] = useState([]);
 
-  const InputHandler = (enteredText) => {
-    setEnteredTodo(enteredText)
-  }
 
-  const addTodoHandler = () => {
-    setTodos(Todos => [...Todos, enteredTodo]);
-    console.log(Todos);
-    setEnteredTodo('');
+
+  const addTodoHandler = (TodoContent) => {
+    setTodos(Todos => [
+      ...Todos,
+      {
+        id: Math.random().toString(),
+        value: TodoContent
+      }
+    ]);
   }
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.inputContainer} >
-        <TextInput
-          placeholder="Your Todos"
-          style={styles.input}
-          value={enteredTodo}
-          onChangeText={InputHandler}
+    <SafeAreaView style={styles.screen}>
+      <View style={{ flex: 1 }}>
+        <View style={styles.screenTitleContainer}>
+          <Text style={styles.screenTitle}>
+            Things Todo
+          </Text>
+        </View>
+
+        <TodoInput addTodo={addTodoHandler} />
+        { /* Better than the scroll view in terms of performance */}
+        <FlatList
+          keyExtractor={(item, index) => item.id}
+          data={Todos}
+          renderItem={itemData => (
+            <Todo onDelete={() => console.log("delete")} todo={itemData.item.value} todoIndex={itemData.index} />
+          )}
+          contentContainerStyle={{ alignItems: 'center' }}
         />
-        <Button title="ADD" onPress={addTodoHandler} />
+
+        {/*  <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
+          {Todos.map((Todo, index) => (
+            <View style={styles.TodoElement} key={index}>
+              <Text style={styles.TodoElementIndex}> {index + 1} </Text>
+              <Text style={styles.TodoElementContent}> {Todo}</Text>
+            </View>
+          ))}
+        </ScrollView> */}
       </View>
-      <View>
-        {Todos.map((Todo, index) => <Text key={index}>{Todo}</Text>)}
-      </View>
-    </View>
+    </SafeAreaView>
+
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
-    padding: 50
+    backgroundColor: '#fff',
+    flex: 1,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+  screenTitleContainer: {
+    backgroundColor: '#1f4068',
+    width: '100%',
+    padding: 0,
+    borderBottomEndRadius: 15,
+    borderBottomStartRadius: 15,
+    shadowColor: 'black',
+    shadowOpacity: 0.9,
+    elevation: 10,
   },
-  input: {
-    borderBottomColor: 'black',
-    borderBottomWidth: 1,
-    marginBottom: 8,
-    padding: 10,
-    flexGrow: .8
-  }
+  screenTitle: {
+    paddingTop: 50,
+    textAlign: 'center',
+    fontSize: 30,
+    color: '#fff',
+    marginBottom: 15,
+  },
 });
 
 
